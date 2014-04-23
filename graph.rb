@@ -28,22 +28,52 @@ class Graph
 
   end
 
+
+
+
   # More methods here
-  def shortest_route(n1, n2, stops=[])
+  def shortest_route(n1, n2)
     node1 = @nodes[n1]
     node2 = @nodes[n2]
-    binding.pry
-    n1_neighbors = n1.edges.keys
-    n1_neighbors.each do |neighbor|
-      if (neighbor == n2)
-        return cost
-      end
-      if !stops.include?(neighbor)
-        shortest_route(neighbor, n2)
-
-    end
+    discovered = {}
+    solved = {}
+    discovered[n1] = 0
+    recursive(node1, node2, discovered, solved)
   end
 
+  def recursive(node1, node2, discovered, solved)
+    node1.edges.each do |neighbor, cost|
+          if !discovered[neighbor]
+            if !solved[neighbor]
+              discovered[neighbor] = discovered[node1.value] + cost
+            end
+          else
+            check = discovered[node1.value] + cost
+            if check < discovered[neighbor]
+              discovered[neighbor] = check
+            end
+          end
+        end
+        solved[node1.value] = discovered[node1.value]
+        discovered.delete(node1.value)
+    end
+      #make a find smallest function separate from this
+        smallest = discovered.values[0]
+        discovered.each.values do |cost|
+            if cost < smallest
+              smallest = cost
+            end
+        end
+        discovered.each do |k,v|
+            if v == smallest[0]
+              smallest_neighbor = k
+              return smallest_neighbor
+            end
+        end
+        if smallest_neighbor == node2
+          return discovered[smallest_neighbor]
+        end
+        recursive(smallest_neighbor, node2, discovered, solved)
 end
 
 class Node
